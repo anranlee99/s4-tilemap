@@ -20,6 +20,10 @@ const imageUrls = [
     "/tile7.png",
     "/tile8.png"
 ];
+for (const url of imageUrls) {
+    const image = new Image();
+    image.src = url;
+}
 
 
 //defining the size of the main grid
@@ -35,12 +39,14 @@ const selectHeight = selectCanvas.height / numSelectables;
 
 //creating the tilemap nested array
 let tilemap: HTMLImageElement[][] = new Array(numTiles);
+let indices: number[] = new Array(numTiles*numTiles);
 
 for(let i = 0; i < numTiles; i++) {
     let row = new Array(numTiles);
     for (let j = 0; j < numTiles; j++) {
         row[j] = new Image();
         row[j].src = "/tile1.png";
+        indices.push(i);
     }
     tilemap[i] = row;
 }
