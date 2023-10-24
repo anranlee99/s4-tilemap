@@ -20,9 +20,11 @@ const imageUrls = [
     "/tile7.png",
     "/tile8.png"
 ];
-for (const url of imageUrls) {
+const templateImages: HTMLImageElement[] = new Array(imageUrls.length);
+for (let i=0; i < imageUrls.length; i++) {
     const image = new Image();
-    image.src = url;
+    image.src = imageUrls[i];
+    templateImages[i] = image;
 }
 
 
@@ -38,21 +40,14 @@ const selectHeight = selectCanvas.height / numSelectables;
 
 
 //creating the tilemap nested array
-let tilemap: HTMLImageElement[][] = new Array(numTiles);
-let indices: number[] = new Array(numTiles*numTiles);
-
+let indices: number[][] = new Array(numTiles);
 for(let i = 0; i < numTiles; i++) {
-    let row = new Array(numTiles);
-    for (let j = 0; j < numTiles; j++) {
-        row[j] = new Image();
-        row[j].src = "/tile1.png";
-        indices.push(i);
-    }
-    tilemap[i] = row;
+    indices[i] = new Array(numTiles);
+    indices[i].fill(0);
 }
 
 //track the selected tile
-let currentTile = "/tile1.png";
+let currentTile  = 0;
 
 //draw the initial canvases
 redrawTilemap();
@@ -75,7 +70,7 @@ function redrawTilemap()
   gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
     for (let i = 0; i < numTiles; i++) {
         for (let j = 0; j < numTiles; j++) {
-            drawTexture(i, j, gridCtx, tilemap[i][j], gridCanvas.width / numTiles, gridCanvas.height / numTiles, tileSize);
+            drawTexture(i, j, gridCtx, templateImages[indices[i][j]], gridCanvas.width / numTiles, gridCanvas.height / numTiles, tileSize);
         }
     }
 }
@@ -85,9 +80,11 @@ gridCanvas.addEventListener("click", (e) => {
     const coordX = Math.trunc(e.offsetX / tileSize);
     const coordY = Math.trunc(e.offsetY / tileSize);
 
-    tilemap[coordX][coordY].src = currentTile;
+    
+    indices[coordX][coordY] = currentTile;
     redrawTilemap();
 })
+// redrawTilemap();
 
 
 // ----- Interacting with the selectable tilemap -----
@@ -95,14 +92,12 @@ gridCanvas.addEventListener("click", (e) => {
 // Loop through the selectable tiles and draw textures in each cell
 function drawSelectCanvas()
 {
-    for (let i = 0; i < numSelectables; i++) {
-        const selectableImage = new Image();
-        selectableImage.src = imageUrls[i];
+    for (let i = 0; i < templateImages.length; i++) {
+        const selectableImage = templateImages[i];
         drawTexture(0, i, selectCtx, selectableImage, selectCanvas.width, selectHeight, 64);
     }
 }
 
 selectCanvas.addEventListener("click", (e) => {
-    const coordY = Math.trunc(e.offsetY / selectHeight);
-    currentTile = imageUrls[coordY];
+    currentTile = Math.trunc(e.offsetY / selectHeight);
 })
